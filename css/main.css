@@ -11,8 +11,3 @@ html{
 body{
     font-size: 1.6rem;
 }
-
-#juegoCanvas{
-    width: 600px;
-    height: 600px;
-}
