@@ -5,6 +5,13 @@ var lienzo = canvas.getContext("2d");
 var widthCanvas = canvas.width;
 var heightCanvas = canvas.height;
 
+/* Variables para las paredes del mapa */
+var topLimit = 0;
+var lefttLimit = 0;
+var rightLimit = widthCanvas - 15;
+var bottomLimit = heightCanvas - 15;
+
+
 /* Variables para la serpiente */
 
 var posSerpiente = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
@@ -43,8 +50,6 @@ var newMovement;
 
 function moverSerpiente(event){
 
-    //console.log("Ultimo movimiento "+ lastMovement);
-
     newMovement = event.keyCode;
 
     if(lastMovement == MOVEMENTS.RIGHT && newMovement == MOVEMENTS.LEFT){
@@ -81,6 +86,30 @@ function moverSerpiente(event){
     }
 }
 
+function colisiones(movement){
+    if(movement.posY == topLimit){
+        restartGame();
+        return false;
+    } else if(movement.posY == bottomLimit){
+        restartGame();
+        return false;
+    } else if(movement.posX == lefttLimit){
+        restartGame();
+        return false;
+    } else if(movement.posX == rightLimit){
+        restartGame();
+        return false;
+    } else{
+        return true;
+    }
+}
+
+function restartGame(){
+    alert('perdiste');
+    initGame();
+    repaintStage();
+}
+
 function generarMovimiento(upMovement, rightMovement, downMovement, leftMovement ){
 
     posSerpiente.shift();
@@ -110,9 +139,10 @@ function generarMovimiento(upMovement, rightMovement, downMovement, leftMovement
 
     newMovement = { posX: xNewPosition, posY: yNewPosition };
 
-    posSerpiente.push(newMovement);
-    repaintStage();
-    
+    if(colisiones(newMovement)){
+        posSerpiente.push(newMovement);
+        repaintStage();
+    }
 }
 
 
@@ -124,6 +154,12 @@ function repaintStage(){
 
 
 function initGame(){
+    posSerpiente = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
+        { posX: 60, posY: 60 },
+        { posX: 75, posY: 60 },
+        { posX: 90, posY: 60 },
+        { posX: 105, posY: 60 },
+    ];
     dibujarParedes(lienzo, 15, 15, widthCanvas, heightCanvas);
     posicionarSerpiente();
 }
