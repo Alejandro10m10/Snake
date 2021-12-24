@@ -7,13 +7,18 @@ var heightCanvas = canvas.height;
 
 /* Variables para la serpiente */
 
-var posXSerpiente = [ //Pisicion inicial de la serpiente en el eje X
-    60, 80, 100, 120
+var posSerpiente = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
+    { posX: 60, posY: 60 },
+    { posX: 75, posY: 60 },
+    { posX: 90, posY: 60 },
+    { posX: 105, posY: 60 },
 ];
 
-var posYSerpiente = 60;
-var widthSerpiente = 20;
-var heightSerpiente = 20;
+//var posYSerpiente = 60;
+var widthSerpiente = 15;
+var heightSerpiente = 15;
+
+var pixelesMovimiento = 15;
 
 /* Variables para el movimiento de la serpiente */
 var MOVEMENTS = {
@@ -24,48 +29,82 @@ var MOVEMENTS = {
     RIGHT: 39,
 };
 
-document.addEventListener("keyup", moverSerpiente);
-
-function moverSerpiente(event){
-    switch(event.keyCode){
-        case MOVEMENTS.UP:
-            console.log('Arriba'); //Restarle a la posicion y (-y)
-            break;
-        case MOVEMENTS.DOWN:
-            console.log('Abajo'); //Sumarle a la posicion y (+y)
-            break;
-        case MOVEMENTS.LEFT:
-            console.log('Izquierda'); //Restarle a la posicion x (-x)
-            break;
-        case MOVEMENTS.RIGHT:  //Sumarle a la posicion x (+x)
-            generarMovimientoDerecha();
-            break;
-        default:
-            console.log('Otra tecla');
-    }
-}
-
-function generarMovimientoDerecha(){
-    posXSerpiente.shift();
-    var posicion = posXSerpiente[posXSerpiente.length-1] + 20;
-    posXSerpiente.push(posicion);
-    repaintStage();
-    posicionarSerpiente();
-
-}
-
-function repaintStage(){
-    lienzo.clearRect(0, 0, widthCanvas, heightCanvas);
-    dibujarParedes(lienzo, 20, 20, widthCanvas, heightCanvas);
-}
-
-
 /* ------------------------------------------------------- */
 /* ----------------- Inicio del juego -------------------- */
 /* ------------------------------------------------------- */
 initGame();
 /* ------------------------------------------------------- */
 /* ------------------------------------------------------- */
+
+document.addEventListener("keyup", moverSerpiente);
+
+var lastMovement = MOVEMENTS.RIGHT;
+var newMovement;
+
+function moverSerpiente(event){
+
+    newMovement = event.keyCode;
+    
+
+    switch(event.keyCode){
+        case MOVEMENTS.UP: //Restarle a la posicion y (-y)
+            generarMovimiento(true, false, false, false);
+            break;
+        case MOVEMENTS.DOWN: //Sumarle a la posicion y (+y)
+            generarMovimiento(false, false, true, false);
+            break;
+        case MOVEMENTS.LEFT: //Restarle a la posicion x (-x)
+            generarMovimiento(false, false, false, true);
+            break;
+        case MOVEMENTS.RIGHT:  //Sumarle a la posicion x (+x)
+            generarMovimiento(false, true, false, false);
+            break;
+        default:
+            console.log('Otra tecla');
+    }
+    
+}
+
+function generarMovimiento(upMovement, rightMovement, downMovement, leftMovement ){
+
+    posSerpiente.shift();
+    var newMovement;
+
+    var xlastPosition = posSerpiente[posSerpiente.length-1].posX;
+    var ylastPosition = posSerpiente[posSerpiente.length-1].posY;
+    var xNewPosition, yNewPosition;
+
+    if(rightMovement){
+        // Si el movimiento es hacia la derecha o izquierda tenemos que sumarle o restarle a la posicion x pero la posicion en y se mantiene
+        xNewPosition = xlastPosition + pixelesMovimiento;
+        yNewPosition = ylastPosition;
+    } else if(leftMovement){
+        // Si el movimiento es hacia arriba o abajo tenemos que sumarle o restarle a la posicion y pero la posicion en x se mantiene
+        xNewPosition = xlastPosition - pixelesMovimiento;
+        yNewPosition = ylastPosition;
+    } else if(downMovement){
+        // Si el movimiento es hacia arriba o abajo tenemos que sumarle o restarle a la posicion y pero la posicion en x se mantiene
+        xNewPosition = xlastPosition;
+        yNewPosition = ylastPosition + pixelesMovimiento;
+    } else if(upMovement){
+        // Si el movimiento es hacia arriba o abajo tenemos que sumarle o restarle a la posicion y pero la posicion en x se mantiene
+        xNewPosition = xlastPosition;
+        yNewPosition = ylastPosition - pixelesMovimiento;
+    }
+
+    newMovement = { posX: xNewPosition, posY: yNewPosition };
+
+    posSerpiente.push(newMovement);
+    repaintStage();
+    
+}
+
+
+function repaintStage(){
+    lienzo.clearRect(0, 0, widthCanvas, heightCanvas);
+    dibujarParedes(lienzo, 20, 20, widthCanvas, heightCanvas);
+    posicionarSerpiente();
+}
 
 
 function initGame(){
@@ -74,8 +113,8 @@ function initGame(){
 }
 
 function posicionarSerpiente(){
-    for(var i = 0; i < posXSerpiente.length ; i++){
-        dibujarSerpiente(posXSerpiente[i], posYSerpiente);
+    for(var i = 0; i < posSerpiente.length ; i++){
+        dibujarSerpiente(posSerpiente[i].posX, posSerpiente[i].posY);
     }
 }
 
