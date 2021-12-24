@@ -36,16 +36,33 @@ initGame();
 /* ------------------------------------------------------- */
 /* ------------------------------------------------------- */
 
-document.addEventListener("keyup", moverSerpiente);
+document.addEventListener("keydown", moverSerpiente);
 
 var lastMovement = MOVEMENTS.RIGHT;
 var newMovement;
 
 function moverSerpiente(event){
 
-    newMovement = event.keyCode;
-    
+    //console.log("Ultimo movimiento "+ lastMovement);
 
+    newMovement = event.keyCode;
+
+    if(lastMovement == MOVEMENTS.RIGHT && newMovement == MOVEMENTS.LEFT){
+        console.log('No puedo ir hacia la izquierda');
+        return;
+    } else if(lastMovement == MOVEMENTS.LEFT && newMovement == MOVEMENTS.RIGHT){
+        console.log('No puedo ir hacia la derecha');
+        return;
+    } else if(lastMovement == MOVEMENTS.UP && newMovement == MOVEMENTS.DOWN){
+        console.log('No puedo ir hacia abajo');
+        return;
+    } else if(lastMovement == MOVEMENTS.DOWN && newMovement == MOVEMENTS.UP){
+        console.log('No puedo ir hacia arriba');
+        return;
+    } else{
+        lastMovement = newMovement;
+    }
+    
     switch(event.keyCode){
         case MOVEMENTS.UP: //Restarle a la posicion y (-y)
             generarMovimiento(true, false, false, false);
@@ -62,7 +79,6 @@ function moverSerpiente(event){
         default:
             console.log('Otra tecla');
     }
-    
 }
 
 function generarMovimiento(upMovement, rightMovement, downMovement, leftMovement ){
@@ -102,13 +118,13 @@ function generarMovimiento(upMovement, rightMovement, downMovement, leftMovement
 
 function repaintStage(){
     lienzo.clearRect(0, 0, widthCanvas, heightCanvas);
-    dibujarParedes(lienzo, 20, 20, widthCanvas, heightCanvas);
+    dibujarParedes(lienzo, 15, 15, widthCanvas, heightCanvas);
     posicionarSerpiente();
 }
 
 
 function initGame(){
-    dibujarParedes(lienzo, 20, 20, widthCanvas, heightCanvas);
+    dibujarParedes(lienzo, 15, 15, widthCanvas, heightCanvas);
     posicionarSerpiente();
 }
 
