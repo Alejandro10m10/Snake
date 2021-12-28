@@ -6,6 +6,8 @@ var widthCanvas = canvas.width;
 var heightCanvas = canvas.height;
 
 var score = 0;
+var ciclo;
+var FPS = 1000 / 15;
 
 /* Variables para las paredes del mapa */
 var wallDistance = 15;
@@ -61,39 +63,44 @@ function moverSerpiente(event){
 
     newMovement = event.keyCode;
 
+
     if(lastMovement == MOVEMENTS.RIGHT && newMovement == MOVEMENTS.LEFT){
-        console.log('No puedo ir hacia la izquierda');
-        return;
+        return; //console.log('No puedo ir hacia la izquierda');
     } else if(lastMovement == MOVEMENTS.LEFT && newMovement == MOVEMENTS.RIGHT){
-        console.log('No puedo ir hacia la derecha');
-        return;
+        return; // console.log('No puedo ir hacia la derecha');
     } else if(lastMovement == MOVEMENTS.UP && newMovement == MOVEMENTS.DOWN){
-        console.log('No puedo ir hacia abajo');
-        return;
+        return; // console.log('No puedo ir hacia abajo');
     } else if(lastMovement == MOVEMENTS.DOWN && newMovement == MOVEMENTS.UP){
-        console.log('No puedo ir hacia arriba');
-        return;
+        return; // console.log('No puedo ir hacia arriba');
     } else{
         lastMovement = newMovement;
     }
     
     switch(event.keyCode){
         case MOVEMENTS.UP: //Restarle a la posicion y (-y)
-            generarMovimiento(true, false, false, false);
+            //generarMovimiento(true, false, false, false);
+            clearInterval(ciclo);
+            ciclo = setInterval( function() { generarMovimiento(true, false, false, false); }, FPS );
             break;
         case MOVEMENTS.DOWN: //Sumarle a la posicion y (+y)
-            generarMovimiento(false, false, true, false);
+            //generarMovimiento(false, false, true, false);
+            clearInterval(ciclo);
+            ciclo = setInterval( function() { generarMovimiento(false, false, true, false); }, FPS );
             break;
         case MOVEMENTS.LEFT: //Restarle a la posicion x (-x)
-            generarMovimiento(false, false, false, true);
+            //generarMovimiento(false, false, false, true);
+            clearInterval(ciclo);
+            ciclo = setInterval( function() { generarMovimiento(false, false, false, true); }, FPS );
             break;
         case MOVEMENTS.RIGHT:  //Sumarle a la posicion x (+x)
-            generarMovimiento(false, true, false, false);
+            clearInterval(ciclo);
+            ciclo = setInterval( function() { generarMovimiento(false, true, false, false); }, FPS );
             break;
         default:
             console.log('Otra tecla');
     }
 }
+
 
 function colisiones(movement){
 
@@ -118,6 +125,7 @@ function bodyCollisions(movement){
 }
 
 function restartGame(){
+    clearInterval(ciclo);
     lastMovement = MOVEMENTS.RIGHT;
     newMovement = "";
     
@@ -202,7 +210,6 @@ function initGame(){
     dibujarParedes(lienzo, wallDistance, wallDistance, widthCanvas, heightCanvas);
     generarComida();
     posicionarSerpiente();
-    
 }
 
 function posicionarSerpiente(){
@@ -244,10 +251,8 @@ function generarComida(){
         }
     }
 
-    lienzo.beginPath();
-    lienzo.fillStyle = "#2e490b";
-    lienzo.fillRect(posXFood, posYFood, widthSerpiente, heightSerpiente);
-    lienzo.stroke();
+    comidaRectangular2(posXFood, posYFood); //Comida rectangular
+    //comidaCircular2(posXFood, posYFood);
 
     posComida = [ //Posición inicial de la serpiente en el eje 'x' y 'y'
         {posX: posXFood, posY: posYFood},
@@ -255,8 +260,46 @@ function generarComida(){
 }
 
 function getLastPositionFood(){
+    comidaRectangular1();
+    //comidaCircular1();
+}
+
+function comidaRectangular1(){
     lienzo.beginPath();
-    lienzo.fillStyle = "#2e490b";
+    lienzo.fillStyle = "#165055";
     lienzo.fillRect(posComida[0].posX, posComida[0].posY, widthSerpiente, heightSerpiente);
+    lienzo.stroke();
+}
+
+function comidaRectangular2(posXFood, posYFood){
+    lienzo.beginPath();
+    lienzo.fillStyle = "#165055";
+    lienzo.fillRect(posXFood, posYFood, widthSerpiente, heightSerpiente);
+    lienzo.stroke();
+}
+
+function comidaCircular1(){
+    lienzo.beginPath();
+    var X = posComida[0].posX;
+    var Y = posComida[0].posY;
+    var r = 4.5;
+    lienzo.strokeStyle = "#2e490b";
+    lienzo.fillStyle = "#2e490b";
+    lienzo.lineWidth = 5;
+    lienzo.arc(X+7,Y+8,r,0,2*Math.PI);
+    lienzo.fill();
+    lienzo.stroke();
+}
+
+function comidaCircular2(posXFood, posYFood){
+    lienzo.beginPath();
+    var X = posXFood;
+    var Y = posYFood;
+    var r = 4.5;
+    lienzo.strokeStyle = "#2e490b";
+    lienzo.fillStyle = "#2e490b";
+    lienzo.lineWidth = 5;
+    lienzo.arc(X+7,Y+8,r,0,2*Math.PI);
+    lienzo.fill();
     lienzo.stroke();
 }
