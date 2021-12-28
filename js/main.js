@@ -5,15 +5,17 @@ var lienzo = canvas.getContext("2d");
 var widthCanvas = canvas.width;
 var heightCanvas = canvas.height;
 
+var score = 0;
+
 /* Variables para las paredes del mapa */
+var wallDistance = 15;
+
 var topLimit = 0;
 var lefttLimit = 0;
-var rightLimit = widthCanvas - 15;
-var bottomLimit = heightCanvas - 15;
-
+var rightLimit = widthCanvas - wallDistance;
+var bottomLimit = heightCanvas - wallDistance;
 
 /* Variables para la serpiente */
-
 var posSerpiente = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
     { posX: 60, posY: 60 },
     { posX: 75, posY: 60 },
@@ -23,9 +25,16 @@ var posSerpiente = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
 
 //var posYSerpiente = 60;
 var widthSerpiente = 15;
-var heightSerpiente = 15;
+var heightSerpiente = widthSerpiente;
 
 var pixelesMovimiento = 15;
+
+/* Variables para la comida de la serpiente */
+var posComida = [];
+var valMinComida = wallDistance; // Esto puede variar dependiendo del canvas
+var valMaxComida = widthCanvas - (wallDistance * 2); // Esto puede variar dependiendo del canvas
+
+var limitFoodPosition = valMaxComida / valMinComida; // Valor maximo en la que nuestros 15px del tamaño de la comida puede generarse dentro del mapa
 
 /* Variables para el movimiento de la serpiente */
 var MOVEMENTS = {
@@ -105,6 +114,7 @@ function colisiones(movement){
 }
 
 function restartGame(){
+    score = 0;
     alert('perdiste');
     initGame();
     repaintStage();
@@ -112,7 +122,6 @@ function restartGame(){
 
 function generarMovimiento(upMovement, rightMovement, downMovement, leftMovement ){
 
-    posSerpiente.shift();
     var newMovement;
 
     var xlastPosition = posSerpiente[posSerpiente.length-1].posX;
@@ -137,21 +146,41 @@ function generarMovimiento(upMovement, rightMovement, downMovement, leftMovement
         yNewPosition = ylastPosition - pixelesMovimiento;
     }
 
+    
+    if(eatFood(xNewPosition, yNewPosition)){
+        repaintStage();
+        generarComida();
+        return;
+    }
+
     newMovement = { posX: xNewPosition, posY: yNewPosition };
 
     if(colisiones(newMovement)){
+        posSerpiente.shift();
         posSerpiente.push(newMovement);
         repaintStage();
+        getLastPositionFood();
     }
 }
 
+function eatFood(xNewSnakePosition, yNewSnakePosition){
+
+    var posXLastFood = posComida[0].posX;
+    var posYLastFood = posComida[0].posY;
+
+    if(xNewSnakePosition == posXLastFood && yNewSnakePosition == posYLastFood){
+        newSnake = { posX: posXLastFood, posY: posYLastFood };
+        posSerpiente.push(newSnake);
+        score++; 
+        return true;
+    }
+}
 
 function repaintStage(){
     lienzo.clearRect(0, 0, widthCanvas, heightCanvas);
-    dibujarParedes(lienzo, 15, 15, widthCanvas, heightCanvas);
+    dibujarParedes(lienzo, wallDistance, wallDistance, widthCanvas, heightCanvas);
     posicionarSerpiente();
 }
-
 
 function initGame(){
     posSerpiente = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
@@ -160,8 +189,10 @@ function initGame(){
         { posX: 90, posY: 60 },
         { posX: 105, posY: 60 },
     ];
-    dibujarParedes(lienzo, 15, 15, widthCanvas, heightCanvas);
+    dibujarParedes(lienzo, wallDistance, wallDistance, widthCanvas, heightCanvas);
+    generarComida();
     posicionarSerpiente();
+    
 }
 
 function posicionarSerpiente(){
@@ -183,5 +214,39 @@ function dibujarSerpiente(posXSerpiente, posYSerpiente){
     lienzo.beginPath();
     lienzo.fillStyle = "#2e490b";
     lienzo.fillRect(posXSerpiente, posYSerpiente, widthSerpiente, heightSerpiente);
+    lienzo.stroke();
+}
+
+/* ------------------- Comida ------------------ */
+function randomPosition(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generarComida(){
+
+    var posXFood = widthSerpiente * randomPosition(1, limitFoodPosition);
+    var posYFood = heightSerpiente * randomPosition(1, limitFoodPosition);
+
+    for(var i = 0; i < posSerpiente.length ; i++){
+        if(posSerpiente[i].posX == posXFood && posSerpiente[i].posY == posYFood){
+            generarComida();
+            return;
+        }
+    }
+
+    lienzo.beginPath();
+    lienzo.fillStyle = "#2e490b";
+    lienzo.fillRect(posXFood, posYFood, widthSerpiente, heightSerpiente);
+    lienzo.stroke();
+
+    posComida = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
+        {posX: posXFood, posY: posYFood},
+    ];
+}
+
+function getLastPositionFood(){
+    lienzo.beginPath();
+    lienzo.fillStyle = "#2e490b";
+    lienzo.fillRect(posComida[0].posX, posComida[0].posY, widthSerpiente, heightSerpiente);
     lienzo.stroke();
 }
