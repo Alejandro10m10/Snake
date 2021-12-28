@@ -96,16 +96,12 @@ function moverSerpiente(event){
 }
 
 function colisiones(movement){
-    if(movement.posY == topLimit){
+
+    /* Colisiones de pared */
+    if(movement.posY == topLimit || movement.posY == bottomLimit || movement.posX == lefttLimit || movement.posX == rightLimit){
         restartGame();
         return false;
-    } else if(movement.posY == bottomLimit){
-        restartGame();
-        return false;
-    } else if(movement.posX == lefttLimit){
-        restartGame();
-        return false;
-    } else if(movement.posX == rightLimit){
+    } else if(bodyCollisions(movement)){
         restartGame();
         return false;
     } else{
@@ -113,11 +109,25 @@ function colisiones(movement){
     }
 }
 
+function bodyCollisions(movement){
+    for(var i = 0; i < posSerpiente.length ; i++){
+        if(posSerpiente[i].posX == movement.posX && posSerpiente[i].posY == movement.posY){
+            return true;
+        }
+    }
+}
+
 function restartGame(){
+    lastMovement = MOVEMENTS.RIGHT;
+    newMovement = "";
+    
     score = 0;
+    
     alert('perdiste');
     initGame();
     repaintStage();
+    generarComida();
+    
 }
 
 function generarMovimiento(upMovement, rightMovement, downMovement, leftMovement ){
@@ -239,7 +249,7 @@ function generarComida(){
     lienzo.fillRect(posXFood, posYFood, widthSerpiente, heightSerpiente);
     lienzo.stroke();
 
-    posComida = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
+    posComida = [ //Posición inicial de la serpiente en el eje 'x' y 'y'
         {posX: posXFood, posY: posYFood},
     ];
 }
