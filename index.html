@@ -5,11 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Juego de Snake</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
     
-    <canvas id="juegoCanvas" width="600" height="600"></canvas>
+    <main>
+        <h1 class="title">Juego de Snake</h1>
+        <section class="gameContent">
+            <img class="keysGame" src="./assets/img/keys.svg" alt="Teclas con las que se interactua con el juego">
+            <img class="consola" src="./assets/img/nintendo.png" alt="Consola de videojuegos">
+            <canvas id="juegoCanvas" width="600" height="600"></canvas>
+        </section>
+    </main>
 
     <script src="js/main.js"></script>
 </body>

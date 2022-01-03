@@ -5,6 +5,10 @@ var lienzo = canvas.getContext("2d");
 var widthCanvas = canvas.width;
 var heightCanvas = canvas.height;
 
+var consola = document.querySelector(".consola");
+var imgInstructions = document.querySelector(".keysGame");
+var currentGame = false;
+
 var score = 0;
 var ciclo;
 var FPS = 1000 / 15;
@@ -18,7 +22,7 @@ var rightLimit = widthCanvas - wallDistance;
 var bottomLimit = heightCanvas - wallDistance;
 
 /* Variables para la serpiente */
-var posSerpiente = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
+var posSerpiente = [ //Posición inicial de la serpiente en el eje 'x' y 'y'
     { posX: 60, posY: 60 },
     { posX: 75, posY: 60 },
     { posX: 90, posY: 60 },
@@ -50,9 +54,11 @@ var MOVEMENTS = {
 /* ------------------------------------------------------- */
 /* ----------------- Inicio del juego -------------------- */
 /* ------------------------------------------------------- */
+
 initGame();
 /* ------------------------------------------------------- */
 /* ------------------------------------------------------- */
+
 
 document.addEventListener("keydown", moverSerpiente);
 
@@ -61,8 +67,15 @@ var newMovement;
 
 function moverSerpiente(event){
 
-    newMovement = event.keyCode;
+    currentGame = true;
 
+    if(currentGame){
+        canvas.classList.remove("snakeCollision");
+        consola.classList.remove("snakeCollision");
+        viewInstructions(false);
+    }
+
+    newMovement = event.keyCode;
 
     if(lastMovement == MOVEMENTS.RIGHT && newMovement == MOVEMENTS.LEFT){
         return; //console.log('No puedo ir hacia la izquierda');
@@ -103,15 +116,12 @@ function moverSerpiente(event){
 
 
 function colisiones(movement){
-
     /* Colisiones de pared */
-    if(movement.posY == topLimit || movement.posY == bottomLimit || movement.posX == lefttLimit || movement.posX == rightLimit){
+    if(movement.posY == topLimit || movement.posY == bottomLimit || movement.posX == lefttLimit || movement.posX == rightLimit || bodyCollisions(movement)){
+        shakeCanvas();
         restartGame();
         return false;
-    } else if(bodyCollisions(movement)){
-        restartGame();
-        return false;
-    } else{
+    }  else{
         return true;
     }
 }
@@ -126,16 +136,22 @@ function bodyCollisions(movement){
 
 function restartGame(){
     clearInterval(ciclo);
+
     lastMovement = MOVEMENTS.RIGHT;
     newMovement = "";
     
     score = 0;
-    
-    alert('perdiste');
+    //alert('perdiste');
     initGame();
     repaintStage();
     generarComida();
-    
+}
+
+function shakeCanvas(){
+    currentGame = false;
+    viewInstructions(true);
+    canvas.classList.add("snakeCollision");
+    consola.classList.add("snakeCollision");
 }
 
 function generarMovimiento(upMovement, rightMovement, downMovement, leftMovement ){
@@ -201,7 +217,7 @@ function repaintStage(){
 }
 
 function initGame(){
-    posSerpiente = [ //Pisicion inicial de la serpiente en el eje 'x' y 'y'
+    posSerpiente = [ //Posición inicial de la serpiente en el eje 'x' y 'y'
         { posX: 60, posY: 60 },
         { posX: 75, posY: 60 },
         { posX: 90, posY: 60 },
@@ -210,6 +226,14 @@ function initGame(){
     dibujarParedes(lienzo, wallDistance, wallDistance, widthCanvas, heightCanvas);
     generarComida();
     posicionarSerpiente();
+}
+
+function viewInstructions(setRemove){
+    if(setRemove){
+        imgInstructions.classList.remove("seeKeyGame");
+    } else{
+        imgInstructions.classList.add("seeKeyGame");
+    }
 }
 
 function posicionarSerpiente(){
@@ -254,7 +278,7 @@ function generarComida(){
     comidaRectangular2(posXFood, posYFood); //Comida rectangular
     //comidaCircular2(posXFood, posYFood);
 
-    posComida = [ //Posición inicial de la serpiente en el eje 'x' y 'y'
+    posComida = [ //Posición inicial de la comida en el eje 'x' y 'y'
         {posX: posXFood, posY: posYFood},
     ];
 }
