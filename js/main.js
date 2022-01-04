@@ -7,6 +7,7 @@ var heightCanvas = canvas.height;
 
 var consola = document.querySelector(".consola");
 var imgInstructions = document.querySelector(".keysGame");
+var scoreTitle = document.querySelector(".userScore");
 var currentGame = false;
 
 var score = 0;
@@ -61,18 +62,29 @@ initGame();
 
 
 document.addEventListener("keydown", moverSerpiente);
+document.addEventListener('keydown', moverSerpiente);  
 
-var lastMovement = MOVEMENTS.RIGHT;
+var defaultFitstMovemnt = true;
+var lastMovement;
 var newMovement;
 
-function moverSerpiente(event){
+var bandera = false;
 
+function moverSerpiente(event){
     currentGame = true;
 
     if(currentGame){
         canvas.classList.remove("snakeCollision");
         consola.classList.remove("snakeCollision");
         viewInstructions(false);
+    }
+
+    // El movimiento por defecto es derecha
+    if(defaultFitstMovemnt){
+        clearInterval(ciclo);
+        ciclo = setInterval( function() { generarMovimiento(false, true, false, false); }, FPS );
+        defaultFitstMovemnt = false;
+        return;
     }
 
     newMovement = event.keyCode;
@@ -85,23 +97,22 @@ function moverSerpiente(event){
         return; // console.log('No puedo ir hacia abajo');
     } else if(lastMovement == MOVEMENTS.DOWN && newMovement == MOVEMENTS.UP){
         return; // console.log('No puedo ir hacia arriba');
+    } else if(lastMovement == newMovement){ 
+        return; //Si la tecla precionada es igual a la anterior el sentido no ha cambiado y el evento continua ejecutandose
     } else{
         lastMovement = newMovement;
     }
     
     switch(event.keyCode){
         case MOVEMENTS.UP: //Restarle a la posicion y (-y)
-            //generarMovimiento(true, false, false, false);
             clearInterval(ciclo);
             ciclo = setInterval( function() { generarMovimiento(true, false, false, false); }, FPS );
             break;
         case MOVEMENTS.DOWN: //Sumarle a la posicion y (+y)
-            //generarMovimiento(false, false, true, false);
             clearInterval(ciclo);
             ciclo = setInterval( function() { generarMovimiento(false, false, true, false); }, FPS );
             break;
         case MOVEMENTS.LEFT: //Restarle a la posicion x (-x)
-            //generarMovimiento(false, false, false, true);
             clearInterval(ciclo);
             ciclo = setInterval( function() { generarMovimiento(false, false, false, true); }, FPS );
             break;
@@ -110,7 +121,7 @@ function moverSerpiente(event){
             ciclo = setInterval( function() { generarMovimiento(false, true, false, false); }, FPS );
             break;
         default:
-            console.log('Otra tecla');
+            return;
     }
 }
 
@@ -136,11 +147,13 @@ function bodyCollisions(movement){
 
 function restartGame(){
     clearInterval(ciclo);
+    defaultFitstMovemnt = true;
 
     lastMovement = MOVEMENTS.RIGHT;
     newMovement = "";
     
     score = 0;
+    scoreTitle.innerHTML = (score);
     //alert('perdiste');
     initGame();
     repaintStage();
@@ -205,9 +218,13 @@ function eatFood(xNewSnakePosition, yNewSnakePosition){
     if(xNewSnakePosition == posXLastFood && yNewSnakePosition == posYLastFood){
         newSnake = { posX: posXLastFood, posY: posYLastFood };
         posSerpiente.push(newSnake);
-        score++; 
+        sumarPuntos();
         return true;
     }
+}
+
+function sumarPuntos(){
+    scoreTitle.innerHTML = (++score);
 }
 
 function repaintStage(){
@@ -217,15 +234,121 @@ function repaintStage(){
 }
 
 function initGame(){
+    /*
     posSerpiente = [ //Posición inicial de la serpiente en el eje 'x' y 'y'
         { posX: 60, posY: 60 },
         { posX: 75, posY: 60 },
         { posX: 90, posY: 60 },
         { posX: 105, posY: 60 },
     ];
+    */
+    posSerpiente = [];
+    fullSnake();
+    
+
     dibujarParedes(lienzo, wallDistance, wallDistance, widthCanvas, heightCanvas);
     generarComida();
     posicionarSerpiente();
+}
+
+
+function fullSnake(){
+
+    var banderaX = 15;
+    var banderaY = 15;
+
+    // valMaxComida Puntos que se pueden hacer
+    for(var i = 1; i<=limitFoodPosition; i++){
+        newSnake = { posX: banderaX, posY: banderaY };
+        posSerpiente.push(newSnake);
+        banderaX += 15;
+    }
+
+    limitFoodPosition--;
+
+    banderaX = 15;
+    var banderaYF = (banderaX * 2);
+    var banderaXF = 570;
+
+    for(var i = 1; i<=limitFoodPosition-1; i++){
+        newSnake = { posX: banderaXF, posY: banderaYF };
+        posSerpiente.push(newSnake);
+        banderaYF += 15;
+    }
+
+    limitFoodPosition++;
+    banderaYF = 570;
+    for(var i = 1; i<=limitFoodPosition; i++){
+        newSnake = { posX: banderaXF, posY: banderaYF };
+        posSerpiente.push(newSnake);
+        banderaXF -= 15;
+    }
+
+    limitFoodPosition--;
+    banderaXF = 15;
+    banderaYF = 570;
+    for(var i = 1; i<=limitFoodPosition; i++){
+        newSnake = { posX: banderaXF, posY: banderaYF };
+        posSerpiente.push(newSnake);
+        banderaYF -= 15;
+    }
+
+    // Top
+    limitFoodPosition-= 2;
+    banderaXF = 30;
+    banderaYF = 30;
+    for(var i = 1; i<=limitFoodPosition; i++){
+        newSnake = { posX: banderaXF, posY: banderaYF };
+        posSerpiente.push(newSnake);
+        banderaXF += 15;
+    }
+
+    // Right
+    limitFoodPosition+= 1;
+    banderaXF = 570-15;
+    banderaYF = 30;
+    for(var i = 1; i<=limitFoodPosition; i++){
+        newSnake = { posX: banderaXF, posY: banderaYF };
+        posSerpiente.push(newSnake);
+        banderaYF += 15;
+    }
+
+    // Bottom
+    limitFoodPosition+= 1;
+    banderaXF = 555+15;
+    banderaYF = 555;
+    for(var i = 1; i<=limitFoodPosition; i++){
+        newSnake = { posX: banderaXF, posY: banderaYF };
+        posSerpiente.push(newSnake);
+        banderaXF -= 15;
+    }
+
+    // Left
+    limitFoodPosition-= 3;
+    banderaXF = 30;
+    banderaYF = 570-15;
+    for(var i = 1; i<=limitFoodPosition; i++){
+        newSnake = { posX: banderaXF, posY: banderaYF };
+        posSerpiente.push(newSnake);
+        banderaYF -= 15;
+    }
+
+    // Top
+    limitFoodPosition+= 1;
+    banderaXF = 15;
+    banderaYF = 45;
+    for(var i = 1; i<=limitFoodPosition; i++){
+        newSnake = { posX: banderaXF, posY: banderaYF };
+        posSerpiente.push(newSnake);
+        banderaXF += 15;
+    }
+
+    
+    
+
+    dibujarParedes(lienzo, wallDistance, wallDistance, widthCanvas, heightCanvas);
+    
+    console.log(posSerpiente);
 }
 
 function viewInstructions(setRemove){

@@ -67,16 +67,35 @@ body{
     display: none;
 }
 
+.scoreTitle{
+    position: absolute;
+    left: calc(50% - 30px);
+    top: calc(1%);
+    z-index: 1;
+}
+
+.userScore{
+    font-weight: bold;
+}
+
 /* Responsive Web Design - Media Queries */
 @media screen and (min-width: 768px) {
     .gameContent {
         width: 50%;
+    }
+
+    .scoreTitle{
+        top: calc(1% + 4px);
     }
 }
 
 @media screen and (min-width: 1280px) {
     .gameContent {
         width: 35%;
+    }
+
+    .scoreTitle{
+        top: calc(1% + 5px);
     }
 }
 
