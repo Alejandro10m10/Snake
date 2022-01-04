@@ -234,121 +234,17 @@ function repaintStage(){
 }
 
 function initGame(){
-    /*
+    
     posSerpiente = [ //Posición inicial de la serpiente en el eje 'x' y 'y'
         { posX: 60, posY: 60 },
         { posX: 75, posY: 60 },
         { posX: 90, posY: 60 },
         { posX: 105, posY: 60 },
     ];
-    */
-    posSerpiente = [];
-    fullSnake();
-    
 
     dibujarParedes(lienzo, wallDistance, wallDistance, widthCanvas, heightCanvas);
     generarComida();
     posicionarSerpiente();
-}
-
-
-function fullSnake(){
-
-    var banderaX = 15;
-    var banderaY = 15;
-
-    // valMaxComida Puntos que se pueden hacer
-    for(var i = 1; i<=limitFoodPosition; i++){
-        newSnake = { posX: banderaX, posY: banderaY };
-        posSerpiente.push(newSnake);
-        banderaX += 15;
-    }
-
-    limitFoodPosition--;
-
-    banderaX = 15;
-    var banderaYF = (banderaX * 2);
-    var banderaXF = 570;
-
-    for(var i = 1; i<=limitFoodPosition-1; i++){
-        newSnake = { posX: banderaXF, posY: banderaYF };
-        posSerpiente.push(newSnake);
-        banderaYF += 15;
-    }
-
-    limitFoodPosition++;
-    banderaYF = 570;
-    for(var i = 1; i<=limitFoodPosition; i++){
-        newSnake = { posX: banderaXF, posY: banderaYF };
-        posSerpiente.push(newSnake);
-        banderaXF -= 15;
-    }
-
-    limitFoodPosition--;
-    banderaXF = 15;
-    banderaYF = 570;
-    for(var i = 1; i<=limitFoodPosition; i++){
-        newSnake = { posX: banderaXF, posY: banderaYF };
-        posSerpiente.push(newSnake);
-        banderaYF -= 15;
-    }
-
-    // Top
-    limitFoodPosition-= 2;
-    banderaXF = 30;
-    banderaYF = 30;
-    for(var i = 1; i<=limitFoodPosition; i++){
-        newSnake = { posX: banderaXF, posY: banderaYF };
-        posSerpiente.push(newSnake);
-        banderaXF += 15;
-    }
-
-    // Right
-    limitFoodPosition+= 1;
-    banderaXF = 570-15;
-    banderaYF = 30;
-    for(var i = 1; i<=limitFoodPosition; i++){
-        newSnake = { posX: banderaXF, posY: banderaYF };
-        posSerpiente.push(newSnake);
-        banderaYF += 15;
-    }
-
-    // Bottom
-    limitFoodPosition+= 1;
-    banderaXF = 555+15;
-    banderaYF = 555;
-    for(var i = 1; i<=limitFoodPosition; i++){
-        newSnake = { posX: banderaXF, posY: banderaYF };
-        posSerpiente.push(newSnake);
-        banderaXF -= 15;
-    }
-
-    // Left
-    limitFoodPosition-= 3;
-    banderaXF = 30;
-    banderaYF = 570-15;
-    for(var i = 1; i<=limitFoodPosition; i++){
-        newSnake = { posX: banderaXF, posY: banderaYF };
-        posSerpiente.push(newSnake);
-        banderaYF -= 15;
-    }
-
-    // Top
-    limitFoodPosition+= 1;
-    banderaXF = 15;
-    banderaYF = 45;
-    for(var i = 1; i<=limitFoodPosition; i++){
-        newSnake = { posX: banderaXF, posY: banderaYF };
-        posSerpiente.push(newSnake);
-        banderaXF += 15;
-    }
-
-    
-    
-
-    dibujarParedes(lienzo, wallDistance, wallDistance, widthCanvas, heightCanvas);
-    
-    console.log(posSerpiente);
 }
 
 function viewInstructions(setRemove){
